@@ -56,6 +56,7 @@
 		if (el != this) {
 			el.innerHTML = this.innerHTML;
 			this.innerHTML = e.dataTransfer.getData('text/html');
+			listChange();
 		}
 		return false;
 	}
@@ -80,6 +81,7 @@
 		if (e.stopPropagation) {
 			e.stopPropagation();
 		}
+		deleteProject(el.innerHTML);
 		el.parentNode.removeChild(el);
 		this.style.borderColor = '#ccc';
 		return false;
@@ -112,7 +114,28 @@
 		ul.appendChild(newItem);
 		items = document.querySelectorAll('.projects li');
 		addListeners();
-		form.elements['project'].value = '';
+		listChange();
+	}
+
+	function listChange() {
+		var tempItems = document.querySelectorAll('.projects li');
+		[].forEach.call(tempItems, function(item, i) {
+			var order = i + 1;
+			var it = 'project=' + item.innerHTML + '&project_order=' + order;
+			saveList(it);
+		});
+	}
+
+	function saveList(item) {
+		var request = new XMLHttpRequest();
+		request.open('GET', 'save.php?' + item);
+		request.send();
+	}
+
+	function deleteProject(item) {
+		var request = new XMLHttpRequest();
+		request.open('GET', 'delete.php?project=' + item);
+		request.send();
 	}
 
 	addListeners();
